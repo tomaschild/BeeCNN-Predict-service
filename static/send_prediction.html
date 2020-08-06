@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<h1>BEECNN API</h1>
+	<input id="file-input" type="file">
+	<button id="predict-button">SUBMIT</button>
+	<p>RESULTADOS:</p>
+	<p>Sana: <span id="p-sana"></span></p>
+	<p>Sin Reina: <span id="p-reina"></span> </p>
+	<p>Varroa: <span id="p-varroa"></span></p>
+	<img id="input-image" scr=""/>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	<script>
+		let base64Image;
+		$("#file-input").change(function(){
+			let reader = new FileReader();
+			reader.onload = function(e){
+
+				let dataURL = reader.result;
+				$('#input-image').attr("src", dataURL);
+				base64Image = dataURL.replace("data:image/png;base64,","");
+			}
+
+			reader.readAsDataURL($("#file-input")[0].files[0]);
+			$("#p-sana").text("");
+			$("#p-reina").text("");
+			$("#p-varroa").text("");
+		});
+
+		$("#predict-button").click(function(event){
+			
+			let message = {
+				image: base64Image
+			}
+
+			$.post("http://127.0.0.1:5000/predict", JSON.stringify(message), function(response){
+				$("#p-sana").text(response.Prediction.Sana);
+				$("#p-reina").text(response.Prediction.Reina);
+				$("#p-varroa").text(response.Prediction.Varroa);
+				console.log(response);
+			});
+		});
+	</script>
+</body>
+</html>
